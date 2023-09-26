@@ -9,18 +9,30 @@ import 'package:project_money_tracker/databases/transaction.dart';
 part 'databases.g.dart';
 
 @DriftDatabase(
-    // relative import for the drift file. Drift also supports `package:`
-    // imports
-    tables: [Categories, Transaction])
+  // relative import for the drift file. Drift also supports `package:`
+  // imports
+  tables: [Categories, Transactions],
+)
 class AppDb extends _$AppDb {
   AppDb() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 6;
+
+  // CRUD Category
 
   Future<List<Category>> getAllCategoryRepo(int type) async {
-    return await (select(categories)..where((tbl) => tbl.Type.equals(type)))
+    return await (select(categories)..where((tbl) => tbl.type.equals(type)))
         .get();
+  }
+
+  Future updateaCategoryRepo(int id, String newName) {
+    return (update(categories)..where((tbl) => tbl.id.equals(id)))
+        .write(CategoriesCompanion(name: Value(newName)));
+  }
+
+  Future deleteCategoryRepo(int id) async {
+    return (delete(categories)..where((tbl) => tbl.id.equals(id))).go();
   }
 }
 
@@ -31,7 +43,6 @@ LazyDatabase _openConnection() {
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
-
-    return NativeDatabase.createInBackground(file);
+    return NativeDatabase(file);
   });
 }
