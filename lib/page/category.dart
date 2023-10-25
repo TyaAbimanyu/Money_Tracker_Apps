@@ -26,7 +26,7 @@ class _CategorPageState extends State<CategorPage> {
           createdAt: now,
           updatedAt: now,
         ));
-    print('Masuk : ' + row.toString());
+    print('Masuk : $row');
   }
 
   Future<List<Category>> getAllCategory(int type) async {
@@ -122,12 +122,12 @@ class _CategorPageState extends State<CategorPage> {
               future: getAllCategory(type),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 } else {
                   if (snapshot.hasData) {
-                    if (snapshot.data!.length > 0) {
+                    if (snapshot.data!.isNotEmpty) {
                       return ListView.builder(
                           itemCount: snapshot.data!.length,
                           shrinkWrap: true,
@@ -142,7 +142,7 @@ class _CategorPageState extends State<CategorPage> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         IconButton(
-                                          icon: Icon(Icons.delete),
+                                          icon: const Icon(Icons.delete),
                                           onPressed: () {
                                             database.deleteCategoryRepo(
                                                 snapshot.data![index].id);
@@ -150,11 +150,11 @@ class _CategorPageState extends State<CategorPage> {
                                             setState(() {});
                                           },
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 10,
                                         ),
                                         IconButton(
-                                          icon: Icon(Icons.edit),
+                                          icon: const Icon(Icons.edit),
                                           onPressed: () {
                                             dialog(snapshot.data![index]);
                                           },
@@ -162,7 +162,7 @@ class _CategorPageState extends State<CategorPage> {
                                       ],
                                     ),
                                     leading: Container(
-                                        padding: EdgeInsets.all(3),
+                                        padding: const EdgeInsets.all(3),
                                         decoration: BoxDecoration(
                                             color: Colors.white,
                                             borderRadius:
@@ -179,12 +179,12 @@ class _CategorPageState extends State<CategorPage> {
                             );
                           });
                     } else {
-                      return Center(
+                      return const Center(
                         child: Text("No Has Data"),
                       );
                     }
                   } else {
-                    return Center(
+                    return const Center(
                       child: Text("No Has Data"),
                     );
                   }

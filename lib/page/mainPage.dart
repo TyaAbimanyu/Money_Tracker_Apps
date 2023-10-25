@@ -4,6 +4,7 @@ import 'package:calendar_appbar/calendar_appbar.dart';
 import 'package:project_money_tracker/page/category.dart';
 import 'package:project_money_tracker/page/homePage.dart';
 import 'package:project_money_tracker/page/transaksi.dart';
+import 'package:intl/intl.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -13,15 +14,30 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final List<Widget> childrn = [
-    const HomePage(),
-    const CategorPage()
-  ]; //Menggunakan Index Area yang akan dipanggil
-  int curr = 0;
+  late DateTime selectDate;
+  late List<Widget> childrn; //Menggunakan Index Area yang akan dipanggil
+  late int curr;
 
-  void TapUser(int index) {
+  @override
+  void initState() {
+    // TODO: implement initState
+    updateView(0, DateTime.now());
+    super.initState();
+  }
+
+  void updateView(int index, DateTime? date) {
     setState(() {
+      if (date != null) {
+        selectDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(date));
+      }
+
       curr = index;
+      childrn = [
+        HomePage(
+          selectDate: selectDate,
+        ),
+        const CategorPage()
+      ];
     });
   }
 
@@ -33,7 +49,12 @@ class _MainPageState extends State<MainPage> {
               accent: Colors.green,
               backButton: false,
               locale: 'id',
-              onDateChanged: (value) => print(value),
+              onDateChanged: (value) {
+                setState(() {
+                  selectDate = value;
+                  updateView(0, selectDate);
+                });
+              },
               firstDate: DateTime.now().subtract(const Duration(days: 365)),
               lastDate: DateTime.now(),
             )
@@ -41,7 +62,8 @@ class _MainPageState extends State<MainPage> {
               preferredSize: const Size.fromHeight(100),
               child: Container(
                 child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 36, horizontal: 16),
                     child: Text(
                       "Categories",
                       style: GoogleFonts.montserrat(
@@ -53,8 +75,10 @@ class _MainPageState extends State<MainPage> {
         child: FloatingActionButton(
           onPressed: () {
             Navigator.of(context)
-                .push(
-                    MaterialPageRoute(builder: (context) => const TransactionPage()))
+                .push(MaterialPageRoute(
+                    builder: (context) => const TransactionPage(
+                          transactionCategory: null,
+                        )))
                 .then((value) {
               setState(() {}); //Arah ke Transaksi Page
             });
@@ -73,7 +97,7 @@ class _MainPageState extends State<MainPage> {
           children: [
             IconButton(
                 onPressed: () {
-                  TapUser(0);
+                  updateView(0, DateTime.now());
                 },
                 icon: const Icon(
                   Icons.home,
@@ -84,7 +108,7 @@ class _MainPageState extends State<MainPage> {
             ),
             IconButton(
                 onPressed: () {
-                  TapUser(1);
+                  updateView(1, null);
                 },
                 icon: const Icon(
                   Icons.list,

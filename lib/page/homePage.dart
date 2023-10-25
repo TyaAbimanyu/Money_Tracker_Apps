@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_money_tracker/databases/databases.dart';
+import 'package:project_money_tracker/databases/transaction_category.dart';
+import 'package:project_money_tracker/page/transaksi.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final DateTime selectDate;
+  const HomePage({Key? key, required this.selectDate}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  final AppDb database = AppDb();
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -111,67 +117,88 @@ class _HomePageState extends State<HomePage> {
 
             //Text Transaction
             Padding(
-                padding: const EdgeInsets.all(18),
-                child: Text(
-                  "Transaction",
-                  style: GoogleFonts.montserrat(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                )),
+              padding: const EdgeInsets.all(18),
+              child: Text(
+                "Transaction",
+                style: GoogleFonts.montserrat(
+                    fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            StreamBuilder<List<TransactionCategory>>(
+              stream: database.getTransactionCategoryByDate(widget.selectDate),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  if (snapshot.hasData) {
+                    if (snapshot.data!.isNotEmpty) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 25),
+                            child: Card(
+                              elevation: 10,
+                              child: ListTile(
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.delete),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.edit),
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .push(MaterialPageRoute(
+                                          builder: (context) => TransactionPage(
+                                            transactionCategory:
+                                                snapshot.data![index],
+                                          ),
+                                        ));
+                                      },
+                                    )
+                                  ],
+                                ),
+                                title: Text("Rp. " +
+                                    snapshot.data![index].transaction.amount
+                                        .toString()),
+                                subtitle: Text(
+                                    snapshot.data![index].category.name +
+                                        " (" +
+                                        snapshot.data![index].category.name +
+                                        ")"),
+                                leading: Container(
+                                  child: Icon(
+                                    Icons.upload,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: Text("Data Not Found"),
+                      );
+                    }
+                  } else {
+                    return Center(
+                      child: Text("Data Not Found"),
+                    );
+                  }
+                }
+              },
+            ),
 
             //List Transaction
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Card(
-                elevation: 10,
-                child: ListTile(
-                  trailing: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.delete),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Icon(Icons.edit)
-                    ],
-                  ),
-                  title: const Text("Rp. 20.000"),
-                  subtitle: const Text("Makan Siang"),
-                  leading: Container(
-                    child: const Icon(
-                      Icons.upload,
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Card(
-                elevation: 10,
-                child: ListTile(
-                  trailing: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.delete),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Icon(Icons.edit)
-                    ],
-                  ),
-                  title: const Text("Rp. 200.000"),
-                  subtitle: const Text("Bayaran"),
-                  leading: Container(
-                    child: const Icon(
-                      Icons.upload,
-                      color: Colors.green,
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),

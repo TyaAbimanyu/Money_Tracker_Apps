@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:project_money_tracker/databases/categories.dart';
 import 'package:project_money_tracker/databases/transaction.dart';
+import 'package:project_money_tracker/databases/transaction_category.dart';
 
 part 'databases.g.dart';
 
@@ -33,6 +34,20 @@ class AppDb extends _$AppDb {
 
   Future deleteCategoryRepo(int id) async {
     return (delete(categories)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Stream<List<TransactionCategory>> getTransactionCategoryByDate(
+      DateTime date) {
+    final Query = (select(transactions).join([
+      innerJoin(categories, categories.id.equalsExp(transactions.category_id))
+    ])
+      ..where(transactions.transaction_date.equals(date)));
+    return Query.watch().map((rows) {
+      return rows.map((row) {
+        return TransactionCategory(
+            row.readTable(transactions), row.readTable(categories));
+      }).toList();
+    });
   }
 }
 

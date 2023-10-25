@@ -341,7 +341,7 @@ class $TransactionsTable extends Transactions
       'id', aliasedName, false,
       hasAutoIncrement: true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
@@ -356,25 +356,17 @@ class $TransactionsTable extends Transactions
   @override
   late final GeneratedColumn<int> category_id = GeneratedColumn<int>(
       'category_id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _amountMeta = const VerificationMeta('amount');
   @override
   late final GeneratedColumn<int> amount = GeneratedColumn<int>(
       'amount', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _transcation_dateMeta =
-      const VerificationMeta('transcation_date');
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _transaction_dateMeta =
+      const VerificationMeta('transaction_date');
   @override
-  late final GeneratedColumn<DateTime> transcation_date =
-      GeneratedColumn<DateTime>('transcation_date', aliasedName, false,
+  late final GeneratedColumn<DateTime> transaction_date =
+      GeneratedColumn<DateTime>('transaction_date', aliasedName, false,
           type: DriftSqlType.dateTime, requiredDuringInsert: true);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
@@ -388,11 +380,11 @@ class $TransactionsTable extends Transactions
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _deltedAtMeta =
-      const VerificationMeta('deltedAt');
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
   @override
-  late final GeneratedColumn<DateTime> deltedAt = GeneratedColumn<DateTime>(
-      'delted_at', aliasedName, true,
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
@@ -400,10 +392,10 @@ class $TransactionsTable extends Transactions
         name,
         category_id,
         amount,
-        transcation_date,
+        transaction_date,
         createdAt,
         updatedAt,
-        deltedAt
+        deletedAt
       ];
   @override
   String get aliasedName => _alias ?? 'transactions';
@@ -416,8 +408,6 @@ class $TransactionsTable extends Transactions
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -439,13 +429,13 @@ class $TransactionsTable extends Transactions
     } else if (isInserting) {
       context.missing(_amountMeta);
     }
-    if (data.containsKey('transcation_date')) {
+    if (data.containsKey('transaction_date')) {
       context.handle(
-          _transcation_dateMeta,
-          transcation_date.isAcceptableOrUnknown(
-              data['transcation_date']!, _transcation_dateMeta));
+          _transaction_dateMeta,
+          transaction_date.isAcceptableOrUnknown(
+              data['transaction_date']!, _transaction_dateMeta));
     } else if (isInserting) {
-      context.missing(_transcation_dateMeta);
+      context.missing(_transaction_dateMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
@@ -459,15 +449,15 @@ class $TransactionsTable extends Transactions
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
-    if (data.containsKey('delted_at')) {
-      context.handle(_deltedAtMeta,
-          deltedAt.isAcceptableOrUnknown(data['delted_at']!, _deltedAtMeta));
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id, category_id, amount};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Transaction map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -480,14 +470,14 @@ class $TransactionsTable extends Transactions
           .read(DriftSqlType.int, data['${effectivePrefix}category_id'])!,
       amount: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}amount'])!,
-      transcation_date: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}transcation_date'])!,
+      transaction_date: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}transaction_date'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      deltedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}delted_at']),
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
     );
   }
 
@@ -502,19 +492,19 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String name;
   final int category_id;
   final int amount;
-  final DateTime transcation_date;
+  final DateTime transaction_date;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final DateTime? deltedAt;
+  final DateTime? deletedAt;
   const Transaction(
       {required this.id,
       required this.name,
       required this.category_id,
       required this.amount,
-      required this.transcation_date,
+      required this.transaction_date,
       required this.createdAt,
       required this.updatedAt,
-      this.deltedAt});
+      this.deletedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -522,11 +512,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     map['name'] = Variable<String>(name);
     map['category_id'] = Variable<int>(category_id);
     map['amount'] = Variable<int>(amount);
-    map['transcation_date'] = Variable<DateTime>(transcation_date);
+    map['transaction_date'] = Variable<DateTime>(transaction_date);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
-    if (!nullToAbsent || deltedAt != null) {
-      map['delted_at'] = Variable<DateTime>(deltedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
     return map;
   }
@@ -537,12 +527,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       name: Value(name),
       category_id: Value(category_id),
       amount: Value(amount),
-      transcation_date: Value(transcation_date),
+      transaction_date: Value(transaction_date),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
-      deltedAt: deltedAt == null && nullToAbsent
+      deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
-          : Value(deltedAt),
+          : Value(deletedAt),
     );
   }
 
@@ -554,10 +544,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       name: serializer.fromJson<String>(json['name']),
       category_id: serializer.fromJson<int>(json['category_id']),
       amount: serializer.fromJson<int>(json['amount']),
-      transcation_date: serializer.fromJson<DateTime>(json['transcation_date']),
+      transaction_date: serializer.fromJson<DateTime>(json['transaction_date']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-      deltedAt: serializer.fromJson<DateTime?>(json['deltedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -568,10 +558,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'name': serializer.toJson<String>(name),
       'category_id': serializer.toJson<int>(category_id),
       'amount': serializer.toJson<int>(amount),
-      'transcation_date': serializer.toJson<DateTime>(transcation_date),
+      'transaction_date': serializer.toJson<DateTime>(transaction_date),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
-      'deltedAt': serializer.toJson<DateTime?>(deltedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -580,19 +570,19 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           String? name,
           int? category_id,
           int? amount,
-          DateTime? transcation_date,
+          DateTime? transaction_date,
           DateTime? createdAt,
           DateTime? updatedAt,
-          Value<DateTime?> deltedAt = const Value.absent()}) =>
+          Value<DateTime?> deletedAt = const Value.absent()}) =>
       Transaction(
         id: id ?? this.id,
         name: name ?? this.name,
         category_id: category_id ?? this.category_id,
         amount: amount ?? this.amount,
-        transcation_date: transcation_date ?? this.transcation_date,
+        transaction_date: transaction_date ?? this.transaction_date,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
-        deltedAt: deltedAt.present ? deltedAt.value : this.deltedAt,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
       );
   @override
   String toString() {
@@ -601,17 +591,17 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('name: $name, ')
           ..write('category_id: $category_id, ')
           ..write('amount: $amount, ')
-          ..write('transcation_date: $transcation_date, ')
+          ..write('transaction_date: $transaction_date, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deltedAt: $deltedAt')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(id, name, category_id, amount,
-      transcation_date, createdAt, updatedAt, deltedAt);
+      transaction_date, createdAt, updatedAt, deletedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -620,10 +610,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.name == this.name &&
           other.category_id == this.category_id &&
           other.amount == this.amount &&
-          other.transcation_date == this.transcation_date &&
+          other.transaction_date == this.transaction_date &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
-          other.deltedAt == this.deltedAt);
+          other.deletedAt == this.deletedAt);
 }
 
 class TransactionsCompanion extends UpdateCompanion<Transaction> {
@@ -631,37 +621,33 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String> name;
   final Value<int> category_id;
   final Value<int> amount;
-  final Value<DateTime> transcation_date;
+  final Value<DateTime> transaction_date;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
-  final Value<DateTime?> deltedAt;
-  final Value<int> rowid;
+  final Value<DateTime?> deletedAt;
   const TransactionsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.category_id = const Value.absent(),
     this.amount = const Value.absent(),
-    this.transcation_date = const Value.absent(),
+    this.transaction_date = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    this.deltedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   });
   TransactionsCompanion.insert({
-    required int id,
+    this.id = const Value.absent(),
     required String name,
     required int category_id,
     required int amount,
-    required DateTime transcation_date,
+    required DateTime transaction_date,
     required DateTime createdAt,
     required DateTime updatedAt,
-    this.deltedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        name = Value(name),
+    this.deletedAt = const Value.absent(),
+  })  : name = Value(name),
         category_id = Value(category_id),
         amount = Value(amount),
-        transcation_date = Value(transcation_date),
+        transaction_date = Value(transaction_date),
         createdAt = Value(createdAt),
         updatedAt = Value(updatedAt);
   static Insertable<Transaction> custom({
@@ -669,22 +655,20 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Expression<String>? name,
     Expression<int>? category_id,
     Expression<int>? amount,
-    Expression<DateTime>? transcation_date,
+    Expression<DateTime>? transaction_date,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
-    Expression<DateTime>? deltedAt,
-    Expression<int>? rowid,
+    Expression<DateTime>? deletedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (category_id != null) 'category_id': category_id,
       if (amount != null) 'amount': amount,
-      if (transcation_date != null) 'transcation_date': transcation_date,
+      if (transaction_date != null) 'transaction_date': transaction_date,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
-      if (deltedAt != null) 'delted_at': deltedAt,
-      if (rowid != null) 'rowid': rowid,
+      if (deletedAt != null) 'deleted_at': deletedAt,
     });
   }
 
@@ -693,21 +677,19 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       Value<String>? name,
       Value<int>? category_id,
       Value<int>? amount,
-      Value<DateTime>? transcation_date,
+      Value<DateTime>? transaction_date,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
-      Value<DateTime?>? deltedAt,
-      Value<int>? rowid}) {
+      Value<DateTime?>? deletedAt}) {
     return TransactionsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       category_id: category_id ?? this.category_id,
       amount: amount ?? this.amount,
-      transcation_date: transcation_date ?? this.transcation_date,
+      transaction_date: transaction_date ?? this.transaction_date,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      deltedAt: deltedAt ?? this.deltedAt,
-      rowid: rowid ?? this.rowid,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 
@@ -726,8 +708,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     if (amount.present) {
       map['amount'] = Variable<int>(amount.value);
     }
-    if (transcation_date.present) {
-      map['transcation_date'] = Variable<DateTime>(transcation_date.value);
+    if (transaction_date.present) {
+      map['transaction_date'] = Variable<DateTime>(transaction_date.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -735,11 +717,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
-    if (deltedAt.present) {
-      map['delted_at'] = Variable<DateTime>(deltedAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
     return map;
   }
@@ -751,11 +730,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           ..write('name: $name, ')
           ..write('category_id: $category_id, ')
           ..write('amount: $amount, ')
-          ..write('transcation_date: $transcation_date, ')
+          ..write('transaction_date: $transaction_date, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deltedAt: $deltedAt, ')
-          ..write('rowid: $rowid')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }

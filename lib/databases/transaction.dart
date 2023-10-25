@@ -1,12 +1,16 @@
 import 'package:drift/drift.dart';
 
+@DataClassName('Transaction')
 class Transactions extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().withLength(max: 128)();
-  IntColumn get category_id => integer().autoIncrement()();
-  IntColumn get amount => integer().autoIncrement()();
-  DateTimeColumn get transcation_date => dateTime()();
+  IntColumn get category_id => integer()();
+  IntColumn get amount => integer()();
+  DateTimeColumn get transaction_date => dateTime()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
-  DateTimeColumn get deltedAt => dateTime().nullable()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
