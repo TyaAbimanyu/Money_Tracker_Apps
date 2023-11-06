@@ -147,7 +147,15 @@ class _HomePageState extends State<HomePage> {
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.delete),
+                                    IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () async {
+                                        await database.deleteTransactionRepo(
+                                            snapshot
+                                                .data![index].transaction.id);
+                                        setState(() {});
+                                      },
+                                    ),
                                     SizedBox(
                                       width: 10,
                                     ),
@@ -156,11 +164,13 @@ class _HomePageState extends State<HomePage> {
                                       onPressed: () {
                                         Navigator.of(context)
                                             .push(MaterialPageRoute(
-                                          builder: (context) => TransactionPage(
-                                            transactionCategory:
-                                                snapshot.data![index],
-                                          ),
-                                        ));
+                                              builder: (context) =>
+                                                  TransactionPage(
+                                                      transactionCategory:
+                                                          snapshot
+                                                              .data![index]),
+                                            ))
+                                            .then((value) {});
                                       },
                                     )
                                   ],
@@ -174,10 +184,16 @@ class _HomePageState extends State<HomePage> {
                                         snapshot.data![index].category.name +
                                         ")"),
                                 leading: Container(
-                                  child: Icon(
-                                    Icons.upload,
-                                    color: Colors.red,
-                                  ),
+                                  child:
+                                      (snapshot.data![index].category.type == 2)
+                                          ? Icon(
+                                              Icons.upload,
+                                              color: Colors.red,
+                                            )
+                                          : Icon(
+                                              Icons.download,
+                                              color: Colors.green,
+                                            ),
                                 ),
                               ),
                             ),

@@ -41,13 +41,21 @@ class _TransactionPageState extends State<TransactionPage> {
     return await database.getAllCategoryRepo(type);
   }
 
+  Future update(int Transactionid, int amount, int categoryID,
+      DateTime transactionDate, String detail) async {
+    await database.updateaTransactionRepo(
+        Transactionid, amount, categoryID, transactionDate, detail);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     if (widget.transactionCategory != null) {
       updateTransaksiHome(widget.transactionCategory!);
+    } else {
+      type = 2;
     }
-    type = 2;
+
     super.initState();
   }
 
@@ -57,7 +65,7 @@ class _TransactionPageState extends State<TransactionPage> {
     Datecontrol.text = DateFormat('yyyy-MM-dd')
         .format(initTransaction.transaction.transaction_date);
     type = initTransaction.category.type;
-    (type == 2) ? isExpaense = true : isExpaense = false;
+    isExpaense = (type == 2);
     SelectedCategory = initTransaction.category;
   }
 
